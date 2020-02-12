@@ -1,9 +1,10 @@
 // TODO:
 // 1. Create a save function and a load function for progress
+// --- I will have to make the save and load function read and write to text files ---
 // 2. Add more skills
-// 3. Add money to inventory
-// 4. Whatever you craft can go to inventory???
-// 5. When training on skills, the number to make things should change in accordance to lvl
+// 3. Whatever you craft can go to inventory???
+// 4. When training on skills, the number to make things should change in accordance to lvl
+// 5. Make a armor and weapon equip option.
 
 #include <iostream>
 #include <cstdlib>
@@ -14,7 +15,7 @@ using namespace std;
 
 class game {
   public: 
-    game(int health = 10, int smithing = 1, int fletching = 1, int mining = 1, int herblore = 1, int alchemy = 1);
+    game(int health = 10, int smithing = 1, int fletching = 1, int mining = 1, int herblore = 1, int alchemy = 1, int playersCurrency = 0);
     void checkHealth();
     void attackEnemy();
     void forgeItem();
@@ -27,6 +28,7 @@ class game {
     void attackLIONHEART();
     void saveGame();
     void loadGame();
+    void goToMarket();
 
   public:
     int m_health;
@@ -35,6 +37,7 @@ class game {
     int m_mining;
     int m_herblore;
     int m_alchemy;
+    int m_playersCurrency;
     int savedHealth;
     int savedMining;
     int savedFletching;
@@ -51,13 +54,16 @@ inline int game::getHealth() const {
 }
 
 inline int game::savingMenu() const {
+  /*
+   Need to fix the save menu function
+  */
   int savedHealth = m_health;
   int savedMining = m_mining;
   int savedFletching = m_fletching;
   int savedSmithing = m_smithing;
   int savedAlchemy = m_alchemy;
   int savedHerblore = m_herblore;
-  return(savedSmithing);
+  return 0;
 }
 
 inline int game::getSkills() const {
@@ -84,13 +90,14 @@ inline int game::getSkills() const {
   return 0;
 }
 
-game::game(int health, int smithing, int fletching, int mining, int herblore, int alchemy):
+game::game(int health, int smithing, int fletching, int mining, int herblore, int alchemy, int playersCurrency):
   m_health(health),
   m_smithing(smithing),
   m_fletching(fletching),
   m_mining(mining),
   m_herblore(herblore),
-  m_alchemy(alchemy)
+  m_alchemy(alchemy),
+  m_playersCurrency(playersCurrency)
 {}
 
 void game::checkHealth() {
@@ -110,6 +117,8 @@ void game::checkHealth() {
 void game::attackRAT() {
   int enemyHealth = 10;
   char playerAttackChoice;
+  srand(time(NULL));
+  int gpWinnings = rand() % 30 + 1;
   cout << "Player health: " << m_health << endl;
   cout << "Enemy health: " << enemyHealth << endl;
   cout << "Attack!" << endl;
@@ -148,6 +157,8 @@ void game::attackRAT() {
       break;
     } else if (enemyHealth <= 0) {
       cout << "Congratulations! You defeated the RAT!!" << endl;
+      cout << "You are rewarded " << gpWinnings << "gp!" << endl;
+      m_playersCurrency += gpWinnings;
       cout << "Now go heal up for another battle!" << endl;
       healPlayer();
       break;
@@ -158,6 +169,8 @@ void game::attackRAT() {
 void game::attackSNAKE() {
   int enemyHealth = 10;
   char playerAttackChoice;
+  srand(time(NULL));
+  int gpWinnings = rand() % 30 + 1;
   cout << "Player health: " << m_health << endl;
   cout << "Enemy health: " << enemyHealth << endl;
   cout << "Attack!" << endl;
@@ -196,6 +209,8 @@ void game::attackSNAKE() {
       break;
     } else if (enemyHealth <= 0) {
       cout << "Congratulations! You defeated the SNAKE!!" << endl;
+      cout << "You are rewarded " << gpWinnings << "gp!" << endl;
+      m_playersCurrency += gpWinnings;
       cout << "Now go heal up for another battle!" << endl;
       healPlayer();
       break;
@@ -206,6 +221,8 @@ void game::attackSNAKE() {
 void game::attackLIONHEART() {
   int enemyHealth = 10;
   char playerAttackChoice;
+  srand(time(NULL));
+  int gpWinnings = rand() % 30 + 1;
   cout << "Player health: " << m_health << endl;
   cout << "Enemy health: " << enemyHealth << endl;
   cout << "Attack!" << endl;
@@ -244,6 +261,8 @@ void game::attackLIONHEART() {
       break;
     } else if (enemyHealth <= 0) {
       cout << "Congratulations! You defeated LIONHEART!!" << endl;
+      cout << "You are rewarded " << gpWinnings << "gp!" << endl;
+      m_playersCurrency += gpWinnings;
       cout << "Now go heal up for another battle!" << endl;
       healPlayer();
       break;
@@ -252,14 +271,15 @@ void game::attackLIONHEART() {
 }
 
 void game::attackEnemy() {
+  srand(time(NULL));
   int enemyPicker = rand() % 3 + 1;
   int enemy1_Rat = 1;
   int enemy2_Snake = 2;
   int enemy3_Lionheart = 3;
-  if (enemyPicker == 1) {
+  if (enemyPicker == enemy1_Rat) {
     cout << "Enemy is Rat!" << endl;
     attackRAT();
-  } else if(enemyPicker == 2) {
+  } else if (enemyPicker == enemy2_Snake) {
     cout << "Enemy is Snake!" << endl;
     attackSNAKE();
   } else {
@@ -276,6 +296,8 @@ void game::forgeItem() {
     cout << "You are able to make bronze daggers!" << endl;
   } else if (smithing >= 5 && smithing < 10) {
     cout << "You are able to make iron daggers!" << endl;
+  } else if (smithing >= 10 && smithing < 15) {
+    cout << "You are able to make steel daggers!" << endl;
   }
 }
 
@@ -315,6 +337,7 @@ void game::trainSkill() {
   } else if (userChoice == "alchemy") {
     cout << "You create 10 pieces of gold to advance in alchemy!" << endl;
     m_alchemy++;
+    m_playersCurrency += 10;
   }
 }
 
@@ -322,26 +345,129 @@ void game::healPlayer() {
   int health = getHealth();
   char heal;
   if (health < 10) {
-    cout << "Press 'H' to heal player." << endl;
+    cout << "Press 'H' to heal player or press 'L' to leave the hospital wing." << endl;
     cin >> heal;
-    cout << "Your health is now at 10!" << endl;
-    m_health = 10;
+    if (heal == 'h') {
+      cout << "Your health is now at 10!" << endl;
+      m_health = 10;
+    } else {
+      // Do nothing...heading back to main
+    }
   } else if (health >= 10) {
     cout << "You are healthy and do not need healing.\n" << endl;
   }
 }
 
 void game::checkInventory() {
+  string choice;
   vector<string> inventory;
   vector<string>::iterator changeInv;
   vector<string>::const_iterator readInv;
 
-  inventory.push_back("Apple");
-  inventory.push_back("Water Jug");
-  inventory.push_back("Axe");
+  inventory.push_back("Fishing Net");
+  inventory.push_back("Tinderbox");
+  inventory.push_back("Iron Axe");
   cout << "Inventory:" << endl;
   for (readInv = inventory.begin(); readInv < inventory.end(); readInv++) {
     cout << *readInv << endl;
+  }
+  cout << "Would you like to check how much gold you have to spend?:" << endl;
+  cin >> choice;
+  if (choice == "yes") {
+    cout << "Gold: " << m_playersCurrency << "gp" << endl;
+  } else {
+    // Do nothing
+  }
+}
+
+void game::goToMarket() {
+  int ironArmor = 100;
+  int ironSword = 35;
+  int bronzeSword = 15;
+  int dragonArmor = 1000;
+  int steelSword = 50;
+  int steelArmor = 175;
+  int mithrilSword = 75;
+  int runeSword = 100;
+  int dragonSword = 150;
+  int shopItem;
+
+  cout << "Items to buy at the market:" << endl;
+  cout << "1. Iron armor: " << ironArmor << "gp" << endl;
+  cout << "2. Iron sword: " << ironSword << "gp" << endl;
+  cout << "3. Bronze sword: " << bronzeSword << "gp" << endl;
+  cout << "4. Dragon armor: " << dragonArmor << "gp" << endl;
+  cout << "5. Steel sword: " << steelSword << "gp" << endl;
+  cout << "6. Steel armor: " << steelArmor << "gp" << endl;
+  cout << "7. Mithril sword: " << mithrilSword << "gp" << endl;
+  cout << "8. Rune sword: " << runeSword << "gp" << endl;
+  cout << "9. Dragon sword: " << dragonSword << "gp" << endl;
+  cout << "\nYour gold: " << m_playersCurrency << "gp" << endl;
+  cout << "\n\nWhat would you like to buy?:" << endl;
+  cin >> shopItem;
+  if (shopItem == 1) {
+    if (m_playersCurrency < ironArmor) {
+      cout << "You cannot afford this item. You need " << ironArmor - m_playersCurrency << " more gold to buy this." << endl;
+    } else {
+      m_playersCurrency -= ironArmor;
+      cout << "You have purchased Iron Armor!" << endl;
+    }
+  } else if (shopItem == 2) {
+    if (m_playersCurrency < ironSword) {
+      cout << "You cannot afford this item. You need " << ironSword - m_playersCurrency << " more gold to buy this." << endl;
+    } else {
+      m_playersCurrency -= ironSword;
+      cout << "You have purchased a Iron Sword!" << endl;
+    }
+  } else if (shopItem == 3) {
+    if (m_playersCurrency < bronzeSword) {
+      cout << "You cannot afford this item. You need " << bronzeSword - m_playersCurrency << " more gold to buy this." << endl;
+    } else {
+      m_playersCurrency -= bronzeSword;
+      cout << "You have purchased a Bronze Sword!" << endl;
+    }
+  } else if (shopItem == 4) {
+    if (m_playersCurrency < dragonArmor) {
+      cout << "You cannot afford this item. You need " << dragonArmor - m_playersCurrency << " more gold to buy this." << endl;
+    } else {
+      m_playersCurrency -= dragonArmor;
+      cout << "You have purchased Dragon Armor!" << endl;
+    }
+  } else if (shopItem == 5) {
+    if (m_playersCurrency < steelSword) {
+      cout << "You cannot afford this item. You need " << steelArmor - m_playersCurrency << " more gold to buy this." << endl;
+    } else {
+      m_playersCurrency -= steelSword;
+      cout << "You have purchased a Steel Sword!" << endl;
+    }
+  } else if (shopItem == 6) {
+    if (m_playersCurrency < steelArmor) {
+      cout << "You cannot afford this item. You need " << steelArmor - m_playersCurrency << " more gold to buy this." << endl;
+    } else {
+      m_playersCurrency -= steelArmor;
+      cout << "You have purchased Steel Armor!" << endl;
+    }
+  } else if (shopItem == 7) {
+    if (m_playersCurrency < mithrilSword) {
+      cout << "You cannot afford this item. You need " << mithrilSword - m_playersCurrency << " more gold to buy this." << endl;
+    } else {
+      m_playersCurrency -= mithrilSword;
+      cout << "You have purchased a Mithril Sword!" << endl;
+    }
+  } else if (shopItem == 8) {
+    if (m_playersCurrency < runeSword) {
+      cout << "You cannot afford this item. You need " << runeSword - m_playersCurrency << " more gold to buy this." << endl;
+    } else {
+      m_playersCurrency -= runeSword;
+      cout << "You have purchased a Rune Sword!" << endl;
+    }
+  } else if (shopItem == 9) {
+    if (m_playersCurrency < dragonSword) {
+      cout << "You cannot afford this item. You need " << dragonSword - m_playersCurrency << " more gold to buy this." << endl;
+    } else {
+      m_playersCurrency -= dragonSword;
+      cout << "You have purchased a Dragon Sword!" << endl;
+    }
   }
 }
 
@@ -374,8 +500,9 @@ int main() {
     cout << "5. Train a skill" << endl;
     cout << "6. Heal player" << endl;
     cout << "7. Check inventory" << endl;
-    cout << "8. Save game" << endl;
-    cout << "9. Load game" << endl;
+    cout << "8. Go to the market" << endl;
+    cout << "9. Save game" << endl;
+    cout << "10. Load game" << endl;
     cin >> choice; 
     switch(choice) {
       case 1:
@@ -409,10 +536,14 @@ int main() {
         break;
 
       case 8:
-        Crusader_Craft.saveGame();
+        Crusader_Craft.goToMarket();
         break;
 
       case 9:
+        Crusader_Craft.saveGame();
+        break;
+
+      case 10:
         Crusader_Craft.loadGame();
         break;
 
