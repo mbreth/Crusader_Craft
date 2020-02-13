@@ -5,6 +5,9 @@
 // 3. Whatever you craft can go to inventory???
 // 4. When training on skills, the number to make things should change in accordance to lvl
 // 5. Make a armor and weapon equip option.
+// 6. Full player level
+// 7. Item stock in market?
+// 8. Boss levels
 
 #include <iostream>
 #include <cstdlib>
@@ -15,7 +18,7 @@ using namespace std;
 
 class game {
   public: 
-    game(int health = 10, int smithing = 1, int fletching = 1, int mining = 1, int herblore = 1, int alchemy = 1, int playersCurrency = 0);
+    game(int health = 10, int smithing = 1, int fletching = 1, int mining = 1, int herblore = 1, int alchemy = 1, int playersCurrency = 0, string playerName = "None", string playerRace = "Nord", int attackLvl = 0, int defenseLvl = 0, string specialAttribute = "None", bool playerCreated = false);
     void checkHealth();
     void attackEnemy();
     void forgeItem();
@@ -29,8 +32,15 @@ class game {
     void saveGame();
     void loadGame();
     void goToMarket();
+    void createPlayer();
 
   public:
+    bool m_playerCreated;
+    string m_playerName;
+    string m_playerRace;
+    string m_specialAttribute;
+    int m_attackLvl;
+    int m_defenseLvl;
     int m_health;
     int m_smithing;
     int m_fletching;
@@ -90,15 +100,86 @@ inline int game::getSkills() const {
   return 0;
 }
 
-game::game(int health, int smithing, int fletching, int mining, int herblore, int alchemy, int playersCurrency):
+game::game(int health, int smithing, int fletching, int mining, int herblore, int alchemy, int playersCurrency, string playerName, string playerRace, int attackLvl, int defenseLvl, string specialAttribute, bool playerCreated):
   m_health(health),
   m_smithing(smithing),
   m_fletching(fletching),
   m_mining(mining),
   m_herblore(herblore),
   m_alchemy(alchemy),
-  m_playersCurrency(playersCurrency)
+  m_playersCurrency(playersCurrency),
+  m_playerName(playerName),
+  m_playerRace(playerRace),
+  m_specialAttribute(specialAttribute),
+  m_attackLvl(attackLvl),
+  m_defenseLvl(defenseLvl),
+  m_playerCreated(playerCreated)
 {}
+
+void game::createPlayer() {
+  string m_playerRace;
+  int choice;
+  cout << "What is your name?:" << endl;
+  cin >> m_playerName;
+  cout << "1. Nord" << endl;
+  cout << "2. Breton" << endl;
+  cout << "3. Orc" << endl;
+  cout << "4. Dark Elf" << endl;
+  cout << "5. Wood Elf" << endl;
+  cout << "6. Dwarf" << endl;
+  cout << "Choose your race:" << endl;
+  cin >> choice;
+
+  switch(choice) {
+    case 1: // Nord
+      m_playerRace = "Nord";
+      m_attackLvl = 15;
+      m_defenseLvl = 10;
+      m_specialAttribute = "Strong warrior with strong resistance against cold weather";
+      break;
+
+    case 2: // Breton
+      m_playerRace = "Breton";
+      m_attackLvl = 12;
+      m_defenseLvl = 12;
+      m_specialAttribute = "Smart warrior with a strength in hand to hand combat";
+      break;
+
+    case 3: // Orc
+      m_playerRace = "Orc";
+      m_attackLvl = 20;
+      m_defenseLvl = 15;
+      m_specialAttribute = "Strong, big, ruthless. Occasionally will make harsh decisions based on rough mentality";
+      break;
+
+    case 4: // Dark elf
+      m_playerRace = "Dark Elf";
+      m_attackLvl = 10;
+      m_defenseLvl = 5;
+      m_specialAttribute = "Small, agile, crafty. Strong in dark magic";
+      break;
+
+    case 5: // Wood elf
+      m_playerRace = "Wood Elf";
+      m_attackLvl = 7;
+      m_defenseLvl = 5;
+      m_specialAttribute = "Small, agile, craft. Excellent with a bow";
+      break;
+
+    case 6: // Dwarf
+      m_playerRace = "Dwarf";
+      m_attackLvl = 18;
+      m_defenseLvl = 12;
+      m_specialAttribute = "Small. Tough. Excellent miners. Willing to attack anytime, anywhere";
+      break;
+  }  
+  cout << "Congratulations! " << m_playerName << "!" << endl;
+  cout << "Race: " << m_playerRace << endl;
+  cout << "Starting attack level: " << m_attackLvl << endl;
+  cout << "Starting defense level: " << m_defenseLvl << endl;
+  cout << "Special attribute: " << m_specialAttribute << endl;
+  m_playerCreated = true;
+}
 
 void game::checkHealth() {
   cout << "Let me check your health..." << endl;
@@ -491,6 +572,7 @@ int main() {
   game Crusader_Craft;
   cout << "Welcome to the World of Crusader-Craft!!\n\n" << endl;
   int choice;
+  Crusader_Craft.createPlayer();
   do {
     cout << "\nWhat would you like to do?:" << endl;
     cout << "1. Attack an enemy" << endl;
@@ -501,8 +583,8 @@ int main() {
     cout << "6. Heal player" << endl;
     cout << "7. Check inventory" << endl;
     cout << "8. Go to the market" << endl;
-    cout << "9. Save game" << endl;
-    cout << "10. Load game" << endl;
+    // cout << "9. Save game" << endl;
+    // cout << "10. Load game" << endl;
     cin >> choice; 
     switch(choice) {
       case 1:
