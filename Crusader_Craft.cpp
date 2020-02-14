@@ -1,13 +1,14 @@
 // TODO:
-// 1. Create a save function and a load function for progress
+//  Create a save function and a load function for progress
 // --- I will have to make the save and load function read and write to text files ---
-// 2. Add more skills
-// 3. Whatever you craft can go to inventory???
-// 4. When training on skills, the number to make things should change in accordance to lvl
-// 5. Make a armor and weapon equip option.
-// 6. Full player level
-// 7. Item stock in market?
-// 8. Boss levels
+//  Add more skills
+//  Whatever you craft can go to inventory???
+//  When training on skills, the number to make things should change in accordance to lvl
+//  Make a armor and weapon equip option.
+//  Item stock in market?
+//  Boss levels
+//  Gender for races
+//  Fix health value variable
 
 #include <iostream>
 #include <cstdlib>
@@ -18,7 +19,7 @@ using namespace std;
 
 class game {
   public: 
-    game(int health = 10, int smithing = 1, int fletching = 1, int mining = 1, int herblore = 1, int alchemy = 1, int playersCurrency = 0, string playerName = "None", string playerRace = "Nord", int attackLvl = 0, int defenseLvl = 0, string specialAttribute = "None", bool playerCreated = false);
+    game(int health = 20, int smithing = 1, int fletching = 1, int mining = 1, int herblore = 1, int alchemy = 1, int playersCurrency = 0, string playerName = "None", string playerRace = "Nord", int attackLvl = 0, int defenseLvl = 0, string specialAttribute = "None", bool playerCreated = false, int playerOvrLvl = 1, bool wearLeather = true, bool wearBronze = false, bool wearIron = false, bool wearSteel = false, bool wearMithril = false, bool wearAdament = false, bool wearRune = false, bool wearDragon = false, bool wieldBronze = false, bool wieldIron = false, bool wieldSteel = false, bool wieldMithril = false, bool wieldAdament = false, bool wieldRune = false, bool wieldDragon = false);
     void checkHealth();
     void attackEnemy();
     void forgeItem();
@@ -33,12 +34,31 @@ class game {
     void loadGame();
     void goToMarket();
     void createPlayer();
+    void trainAtk_and_def();
+    void checkCombatLevel();
+    void equipItems();
 
   public:
-    bool m_playerCreated;
     string m_playerName;
     string m_playerRace;
     string m_specialAttribute;
+    bool m_playerCreated;
+    bool m_wearLeather;
+    bool m_wearBronze;
+    bool m_wearIron;
+    bool m_wearSteel;
+    bool m_wearMithril;
+    bool m_wearAdament;
+    bool m_wearRune;
+    bool m_wearDragon;
+    bool m_wieldBronze;
+    bool m_wieldIron;
+    bool m_wieldSteel;
+    bool m_wieldMithril;
+    bool m_wieldAdament;
+    bool m_wieldRune;
+    bool m_wieldDragon;
+    int m_playerOvrLvl;
     int m_attackLvl;
     int m_defenseLvl;
     int m_health;
@@ -100,7 +120,7 @@ inline int game::getSkills() const {
   return 0;
 }
 
-game::game(int health, int smithing, int fletching, int mining, int herblore, int alchemy, int playersCurrency, string playerName, string playerRace, int attackLvl, int defenseLvl, string specialAttribute, bool playerCreated):
+game::game(int health, int smithing, int fletching, int mining, int herblore, int alchemy, int playersCurrency, string playerName, string playerRace, int attackLvl, int defenseLvl, string specialAttribute, bool playerCreated, int playerOvrLvl, bool wearLeather, bool wearBronze, bool wearIron, bool wearSteel, bool wearMithril, bool wearAdament, bool wearRune, bool wearDragon, bool wieldBronze, bool wieldIron, bool wieldSteel, bool wieldMithril, bool wieldAdament, bool wieldRune, bool wieldDragon):
   m_health(health),
   m_smithing(smithing),
   m_fletching(fletching),
@@ -113,7 +133,23 @@ game::game(int health, int smithing, int fletching, int mining, int herblore, in
   m_specialAttribute(specialAttribute),
   m_attackLvl(attackLvl),
   m_defenseLvl(defenseLvl),
-  m_playerCreated(playerCreated)
+  m_playerCreated(playerCreated),
+  m_playerOvrLvl(playerOvrLvl),
+  m_wearLeather(wearLeather),
+  m_wearBronze(wearBronze),
+  m_wearIron(wearIron),
+  m_wearSteel(wearSteel),
+  m_wearMithril(wearMithril),
+  m_wearAdament(wearAdament),
+  m_wearRune(wearRune),
+  m_wearDragon(wearDragon),
+  m_wieldBronze(wieldBronze),
+  m_wieldIron(wieldIron),
+  m_wieldSteel(wieldSteel),
+  m_wieldMithril(wieldMithril),
+  m_wieldAdament(wieldAdament),
+  m_wieldRune(wieldRune),
+  m_wieldDragon(wieldDragon)
 {}
 
 void game::createPlayer() {
@@ -163,7 +199,7 @@ void game::createPlayer() {
       m_playerRace = "Wood Elf";
       m_attackLvl = 7;
       m_defenseLvl = 5;
-      m_specialAttribute = "Small, agile, craft. Excellent with a bow";
+      m_specialAttribute = "Small, agile, crafty. Excellent with a bow";
       break;
 
     case 6: // Dwarf
@@ -173,17 +209,19 @@ void game::createPlayer() {
       m_specialAttribute = "Small. Tough. Excellent miners. Willing to attack anytime, anywhere";
       break;
   }  
+  checkCombatLevel();
   cout << "Congratulations! " << m_playerName << "!" << endl;
   cout << "Race: " << m_playerRace << endl;
   cout << "Starting attack level: " << m_attackLvl << endl;
   cout << "Starting defense level: " << m_defenseLvl << endl;
   cout << "Special attribute: " << m_specialAttribute << endl;
+  cout << "Player level: " << m_playerOvrLvl << endl;
   m_playerCreated = true;
 }
 
 void game::checkHealth() {
   cout << "Let me check your health..." << endl;
-  int health = getHealth();
+  int health = m_health;
   if (health <= 0) {
     cout << "You are dead." << endl;
   } else if (health >= 10) {
@@ -196,7 +234,7 @@ void game::checkHealth() {
 }
 
 void game::attackRAT() {
-  int enemyHealth = 10;
+  int enemyHealth = 20;
   char playerAttackChoice;
   srand(time(NULL));
   int gpWinnings = rand() % 30 + 1;
@@ -216,7 +254,7 @@ void game::attackRAT() {
       } else if (enemyFightAction == 2) {
         cout << "The RAT has blocked your attack! No damage dealt or taken!" << endl;
       } else {
-        cout << "You hit the RAT for 2 damage as he coward with fear!" << endl;
+        cout << "You hit the RAT for " << m_attackLvl / 3 << " damage as he coward with fear!" << endl;
         enemyHealth -= 2;
       }
     } else if (playerAttackChoice == 'd') {
@@ -248,7 +286,7 @@ void game::attackRAT() {
 }
 
 void game::attackSNAKE() {
-  int enemyHealth = 10;
+  int enemyHealth = 20;
   char playerAttackChoice;
   srand(time(NULL));
   int gpWinnings = rand() % 30 + 1;
@@ -268,7 +306,7 @@ void game::attackSNAKE() {
       } else if (enemyFightAction == 2) {
         cout << "The SNAKE has blocked your attack! No damage dealt or taken!" << endl;
       } else {
-        cout << "You hit the SNAKE for 2 damage as he coward with fear!" << endl;
+        cout << "You hit the SNAKE for " << m_attackLvl / 3 << " damage as he coward with fear!" << endl;
         enemyHealth -= 2;
       }
     } else if (playerAttackChoice == 'd') {
@@ -300,7 +338,7 @@ void game::attackSNAKE() {
 }
 
 void game::attackLIONHEART() {
-  int enemyHealth = 10;
+  int enemyHealth = 20;
   char playerAttackChoice;
   srand(time(NULL));
   int gpWinnings = rand() % 30 + 1;
@@ -320,7 +358,7 @@ void game::attackLIONHEART() {
       } else if (enemyFightAction == 2) {
         cout << "The LIONHEART has blocked your attack! No damage dealt or taken!" << endl;
       } else {
-        cout << "You hit the LIONHEART for 2 damage as he coward with fear!" << endl;
+        cout << "You hit the LIONHEART for " << m_attackLvl / 3 << " damage as he coward with fear!" << endl;
         enemyHealth -= 2;
       }
     } else if (playerAttackChoice == 'd') {
@@ -396,6 +434,10 @@ void game::checkSkills() {
   cout << "Herblore: " << m_herblore << endl;
   cout << "Mining: " << m_mining << endl;
   cout << "Alchemy: " << m_alchemy << endl;
+  cout << "Attack: " << m_attackLvl << endl;
+  cout << "Defense: " << m_defenseLvl << endl;
+  cout << "Special attribute: " << m_specialAttribute << endl;
+  cout << "Combat level: " << m_playerOvrLvl << endl;
 }
 
 void game::trainSkill() {
@@ -430,7 +472,7 @@ void game::healPlayer() {
     cin >> heal;
     if (heal == 'h') {
       cout << "Your health is now at 10!" << endl;
-      m_health = 10;
+      m_health = m_attackLvl + 5;
     } else {
       // Do nothing...heading back to main
     }
@@ -459,6 +501,49 @@ void game::checkInventory() {
   } else {
     // Do nothing
   }
+}
+
+void game::checkCombatLevel() {
+  int total = m_attackLvl + m_defenseLvl;
+  if (total == 25) {
+    m_playerOvrLvl++;
+  } 
+  if (total == 30) {
+    m_playerOvrLvl++;
+  } 
+  if (total == 35) {
+    m_playerOvrLvl++;
+  } 
+  if (total == 40) {
+    m_playerOvrLvl++;
+  }
+  if (total == 45) {
+    m_playerOvrLvl++;
+  } 
+  if (total == 50) {
+    m_playerOvrLvl++;
+  }
+  if (total == 55) {
+    m_playerOvrLvl++;
+  } 
+  if (total == 60) {
+    m_playerOvrLvl++;
+  }
+  if (total == 65) {
+    m_playerOvrLvl++;
+  } 
+  if (total == 70) {
+    m_playerOvrLvl++;
+  } 
+  if (total == 75) {
+    m_playerOvrLvl++;
+  } 
+  if (total == 80) {
+    m_playerOvrLvl++;
+  } 
+  if (total == 85) {
+    m_playerOvrLvl++;
+  } 
 }
 
 void game::goToMarket() {
@@ -559,7 +644,6 @@ void game::saveGame() {
   savingMenu();
   sleep(3);
   cout << "Game saved!" << endl;
-  
 }
 
 void game::loadGame() {
@@ -568,12 +652,160 @@ void game::loadGame() {
   cout << "Your previous HEALTH LEVEL is " << savedHealth << endl;
 }
 
+void game::equipItems() {
+  if (m_defenseLvl < 20) {
+    m_wearLeather = true;
+    m_wearBronze = true;
+    m_wearIron = false;
+    m_wearSteel = false;
+    m_wearMithril = false;
+    m_wearAdament = false;
+    m_wearRune = false;
+    m_wearDragon = false;
+
+    m_wieldBronze = true;
+    m_wieldIron = false;
+    m_wieldSteel = false;
+    m_wieldMithril = false;
+    m_wieldAdament = false;
+    m_wieldRune = false;
+    m_wieldDragon = false;
+  } else if (m_defenseLvl >= 20 && m_defenseLvl < 30) {
+    m_wearLeather = true;
+    m_wearBronze = true;
+    m_wearIron = true;
+    m_wearSteel = false;
+    m_wearMithril = false;
+    m_wearAdament = false;
+    m_wearRune = false;
+    m_wearDragon = false;
+
+    m_wieldBronze = true;
+    m_wieldIron = true;
+    m_wieldSteel = false;
+    m_wieldMithril = false;
+    m_wieldAdament = false;
+    m_wieldRune = false;
+    m_wieldDragon = false;
+  } else if (m_defenseLvl >= 30 && m_defenseLvl < 40) {
+    m_wearLeather = true;
+    m_wearBronze = true;
+    m_wearIron = true;
+    m_wearSteel = true;
+    m_wearMithril = false;
+    m_wearAdament = false;
+    m_wearRune = false;
+    m_wearDragon = false;
+
+    m_wieldBronze = true;
+    m_wieldIron = true;
+    m_wieldSteel = true;
+    m_wieldMithril = false;
+    m_wieldAdament = false;
+    m_wieldRune = false;
+    m_wieldDragon = false;
+  } else if (m_defenseLvl >= 40 && m_defenseLvl < 50) {
+    m_wearLeather = true;
+    m_wearBronze = true;
+    m_wearIron = true;
+    m_wearSteel = true;
+    m_wearMithril = true;
+    m_wearAdament = false;
+    m_wearRune = false;
+    m_wearDragon = false;
+
+    m_wieldBronze = true;
+    m_wieldIron = true;
+    m_wieldSteel = true;
+    m_wieldMithril = true;
+    m_wieldAdament = false;
+    m_wieldRune = false;
+    m_wieldDragon = false;
+  } else if (m_defenseLvl >= 50 && m_defenseLvl < 60) {
+    m_wearLeather = true;
+    m_wearBronze = true;
+    m_wearIron = true;
+    m_wearSteel = true;
+    m_wearMithril = true;
+    m_wearAdament = true;
+    m_wearRune = false;
+    m_wearDragon = false;
+
+    m_wieldBronze = true;
+    m_wieldIron = true;
+    m_wieldSteel = true;
+    m_wieldMithril = true;
+    m_wieldAdament = true;
+    m_wieldRune = false;
+    m_wieldDragon = false;
+  } else if (m_defenseLvl >= 60 && m_defenseLvl < 70) {
+    m_wearLeather = true;
+    m_wearBronze = true;
+    m_wearIron = true;
+    m_wearSteel = true;
+    m_wearMithril = true;
+    m_wearAdament = true;
+    m_wearRune = true;
+    m_wearDragon = false;
+
+    m_wieldBronze = true;
+    m_wieldIron = true;
+    m_wieldSteel = true;
+    m_wieldMithril = true;
+    m_wieldAdament = true;
+    m_wieldRune = true;
+    m_wieldDragon = false;
+  } else if (m_defenseLvl >= 70 && m_defenseLvl < 80) {
+    m_wearLeather = true;
+    m_wearBronze = true;
+    m_wearIron = true;
+    m_wearSteel = true;
+    m_wearMithril = true;
+    m_wearAdament = true;
+    m_wearRune = true;
+    m_wearDragon = true;
+
+    m_wieldBronze = true;
+    m_wieldIron = true;
+    m_wieldSteel = true;
+    m_wieldMithril = true;
+    m_wieldAdament = true;
+    m_wieldRune = true;
+    m_wieldDragon = true;
+  }
+}
+
+void game::trainAtk_and_def() {
+  int choice;
+  cout << "Which would you like to train?:" << endl;
+  cout << "1. Attack" << endl;
+  cout << "2. Defense" << endl;
+  cin >> choice;
+  float time_a = m_attackLvl / 2;
+  float time_b = m_defenseLvl / 2;
+  if (choice == 1) {
+    cout << "You embark on a journey to level up your attack level..." << endl;
+    sleep(time_a);
+    m_attackLvl++;
+    cout << "Congratulations! You are now attack level " << m_attackLvl << "!" << endl;
+  } else {
+    cout << "You embark on a journey to level up your defense level..." << endl;
+    sleep(time_b);
+    m_defenseLvl++;
+    cout << "Congratulations! You are now attack level " << m_defenseLvl << "!" << endl;
+  }
+}
+
 int main() {
   game Crusader_Craft;
   cout << "Welcome to the World of Crusader-Craft!!\n\n" << endl;
   int choice;
-  Crusader_Craft.createPlayer();
+  bool m_playerCreated;
+  if (m_playerCreated == false) {
+    Crusader_Craft.createPlayer();
+  }
   do {
+    Crusader_Craft.checkCombatLevel();
     cout << "\nWhat would you like to do?:" << endl;
     cout << "1. Attack an enemy" << endl;
     cout << "2. Forge an item" << endl;
@@ -583,6 +815,8 @@ int main() {
     cout << "6. Heal player" << endl;
     cout << "7. Check inventory" << endl;
     cout << "8. Go to the market" << endl;
+    cout << "9. Train attack and defense" << endl;
+    cout << "10. Equip items" << endl;
     // cout << "9. Save game" << endl;
     // cout << "10. Load game" << endl;
     cin >> choice; 
@@ -622,11 +856,11 @@ int main() {
         break;
 
       case 9:
-        Crusader_Craft.saveGame();
+        Crusader_Craft.trainAtk_and_def();
         break;
 
       case 10:
-        Crusader_Craft.loadGame();
+        Crusader_Craft.equipItems();
         break;
 
       default:
